@@ -43,7 +43,7 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
 
     async def insert_needles(self, context, depth_percent, context_length):
         """
-        Added: 句読点のあとにのみ needle を挿入するように変更
+        Added: 句読点の情報を追加(日本語の句読点、改行)
 
         Inserts multiple needles (specific facts or pieces of information) into the original context string at 
         designated depth percentages, effectively distributing these needles throughout the context. This method 
@@ -102,11 +102,15 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
                 period_tokens = self.model_to_test.encode_text_to_tokens('.')
                 period_tokens_japanese1 = self.model_to_test.encode_text_to_tokens('。')
                 period_tokens_japanese2 = self.model_to_test.encode_text_to_tokens('、')
+                newline_tokens1 = self.model_to_test.encode_text_to_tokens('\n')
+                newline_tokens2 = self.model_to_test.encode_text_to_tokens('\r')
                 
                 # Then we iteration backwards until we find the first period
                 while tokens_new_context and (tokens_new_context[-1] not in period_tokens or 
                                               tokens_new_context[-1] not in period_tokens_japanese1 or
-                                              tokens_new_context[-1] not in period_tokens_japanese2
+                                              tokens_new_context[-1] not in period_tokens_japanese2 or
+                                              tokens_new_context[-1] not in newline_tokens1 or
+                                              tokens_new_context[-1] not in newline_tokens2
                                               ):
                     insertion_point -= 1
                     tokens_new_context = tokens_context[:insertion_point]

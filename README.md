@@ -1,3 +1,8 @@
+日本語を意識した Needle In A Haystack test のリポジトリです。
+
+- 句読点のあとに needle を挿入するように変更
+- WIP
+
 # Needle In A Haystack - Pressure Testing LLMs
 
 A simple 'needle in a haystack' analysis to test in-context retrieval ability of long context LLMs.
