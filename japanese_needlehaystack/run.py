@@ -110,7 +110,7 @@ def main():
     if args.multi_needle == True:
         print("Testing multi-needle")
         tester = LLMMultiNeedleHaystackTester(**args.__dict__)
-    else: 
+    else:
         print("Testing single-needle")
         tester = LLMNeedleHaystackTester(**args.__dict__)
     tester.start_test()

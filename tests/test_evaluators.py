@@ -1,6 +1,6 @@
 from unittest.mock import patch, MagicMock, call, ANY
 
-from needlehaystack.evaluators import OpenAIEvaluator
+from japanese_needlehaystack.evaluators import OpenAIEvaluator
 
 QUESTION_ASKED = "What is the color of the sky?"
 QUESTION_ANSWER = "Sky is blue"

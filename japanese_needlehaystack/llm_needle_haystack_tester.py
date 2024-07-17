@@ -242,6 +242,10 @@ class LLMNeedleHaystackTester:
         return context
     
     def insert_needle(self, context, depth_percent, context_length):
+        # 改行記号は句読点に置き換える
+        context = context.replace('\n', '。')
+        context = context.replace('\r', '。')
+
         tokens_needle = self.model_to_test.encode_text_to_tokens(self.needle)
         tokens_context = self.model_to_test.encode_text_to_tokens(context)
 
@@ -264,9 +268,14 @@ class LLMNeedleHaystackTester:
 
             # We want to make sure that we place our needle at a sentence break so we first see what token a '.' is
             period_tokens = self.model_to_test.encode_text_to_tokens('.')
+            period_tokens_japanese1 = self.model_to_test.encode_text_to_tokens('。')
+            period_tokens_japanese2 = self.model_to_test.encode_text_to_tokens('、')
             
             # Then we iteration backwards until we find the first period
-            while tokens_new_context and tokens_new_context[-1] not in period_tokens:
+            while tokens_new_context and (tokens_new_context[-1] not in period_tokens or
+                                          tokens_new_context[-1] not in period_tokens_japanese1 or
+                                          tokens_new_context[-1] not in period_tokens_japanese2
+                                        ):
                 insertion_point -= 1
                 tokens_new_context = tokens_context[:insertion_point]
 
