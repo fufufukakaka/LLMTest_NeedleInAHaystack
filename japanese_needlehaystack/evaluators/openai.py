@@ -8,12 +8,12 @@ from langchain_community.chat_models import ChatOpenAI
 class OpenAIEvaluator(Evaluator):
     DEFAULT_MODEL_KWARGS: dict = dict(temperature=0)
     CRITERIA = {"accuracy": """
-                Score 1: The answer is completely unrelated to the reference.
-                Score 3: The answer has minor relevance but does not align with the reference.
-                Score 5: The answer has moderate relevance but contains inaccuracies.
-                Score 7: The answer aligns with the reference but has minor omissions.
-                Score 10: The answer is completely accurate and aligns perfectly with the reference.
-                Only respond with a numberical score"""}
+            スコア 1: 回答が参照情報と全く関連がない。もしくは抽出することができなかった。
+            スコア 3: 回答には若干の関連性があるが、参照情報と一致しない。
+            スコア 5: 回答には適度な関連性があるが、不正確な情報が含まれている。
+            スコア 7: 回答が参照情報と一致しているが、些細な欠落がある。
+            スコア 10: 回答が完全に正確で、参照情報と完全に一致している。
+            数値のスコアのみを回答してください"""}
 
     def __init__(self,
                  model_name: str = "gpt-3.5-turbo-0125",
