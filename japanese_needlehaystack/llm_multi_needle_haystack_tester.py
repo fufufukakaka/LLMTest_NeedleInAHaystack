@@ -108,7 +108,7 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
                 
                 # Then we iteration backwards until we find the first period
                 while tokens_new_context and (tokens_new_context[-1] not in period_tokens and
-                                              tokens_new_context[-1] not in period_tokens_japanese1
+                                              tokens_new_context[-1] not in period_tokens_japanese
                                               ):
                     insertion_point -= 1
                     tokens_new_context = tokens_context[:insertion_point]
