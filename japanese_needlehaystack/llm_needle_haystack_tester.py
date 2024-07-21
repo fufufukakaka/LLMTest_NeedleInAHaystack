@@ -268,13 +268,11 @@ class LLMNeedleHaystackTester:
 
             # We want to make sure that we place our needle at a sentence break so we first see what token a '.' is
             period_tokens = self.model_to_test.encode_text_to_tokens('.')
-            period_tokens_japanese1 = self.model_to_test.encode_text_to_tokens('。')
-            period_tokens_japanese2 = self.model_to_test.encode_text_to_tokens('、')
+            period_tokens_japanese = self.model_to_test.encode_text_to_tokens('。')
             
             # Then we iteration backwards until we find the first period
-            while tokens_new_context and (tokens_new_context[-1] not in period_tokens or
-                                          tokens_new_context[-1] not in period_tokens_japanese1 or
-                                          tokens_new_context[-1] not in period_tokens_japanese2
+            while tokens_new_context and (tokens_new_context[-1] not in period_tokens and
+                                          tokens_new_context[-1] not in period_tokens_japanese
                                         ):
                 insertion_point -= 1
                 tokens_new_context = tokens_context[:insertion_point]
