@@ -40,12 +40,14 @@ class OpenAIEvaluator(Evaluator):
         model_name: str = "gpt-3.5-turbo-0125",
         model_kwargs: dict = DEFAULT_MODEL_KWARGS,
         true_answer: str = None,
+        fake_answer: str = None,
         question_asked: str = None,
     ):
         """
         :param model_name: The name of the model.
         :param model_kwargs: Model configuration. Default is {temperature: 0}
         :param true_answer: The true answer to the question asked.
+        :param fake_answer: The fake answer to the question asked.
         :param question_asked: The question asked to the model.
         """
 
@@ -57,6 +59,7 @@ class OpenAIEvaluator(Evaluator):
         self.model_name = model_name
         self.model_kwargs = model_kwargs
         self.true_answer = true_answer
+        self.fake_answer = fake_answer
         self.question_asked = question_asked
 
         api_key = os.getenv("NIAH_EVALUATOR_API_KEY")
@@ -71,10 +74,20 @@ class OpenAIEvaluator(Evaluator):
             model=self.model_name, openai_api_key=self.api_key, **self.model_kwargs
         )
 
-    def evaluate_response(self, response: str, multi_needles: bool = False) -> int:
+    def evaluate_response(
+        self,
+        response: str,
+        multi_needles: bool = False,
+        evaluate_fake_answer: bool = False,
+    ) -> int:
         if multi_needles:
             eval_result = self.evaluate_responses_in_multi_needles(
                 student_answer=response, reference=self.true_answer
+            )
+            return int(eval_result[0].score)
+        if evaluate_fake_answer:
+            eval_result = self.evaluate_responses_in_multi_needles(
+                student_answer=response, reference=self.fake_answer
             )
             return int(eval_result[0].score)
         else:
@@ -127,7 +140,9 @@ class OpenAIEvaluator(Evaluator):
 
         ## LLM
         # Use most performant(and cheap) model as grader
-        model = ChatOpenAI(temperature=0, model="gpt-4o-mini", openai_api_key=self.api_key)
+        model = ChatOpenAI(
+            temperature=0, model="gpt-4o-mini", openai_api_key=self.api_key
+        )
 
         # Tool
         grade_tool_oai = convert_to_openai_tool(grade)
