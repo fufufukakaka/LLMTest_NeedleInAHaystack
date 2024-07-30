@@ -193,7 +193,7 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
             test_elapsed_time = test_end_time - test_start_time
 
             results = {
-            # 'context' : context, # Uncomment this line if you'd like to save the context the model was asked to retrieve from. Warning: This will become very large.
+            'context' : context, # Uncomment this line if you'd like to save the context the model was asked to retrieve from. Warning: This will become very large.
             'model' : self.model_to_test.model_name,
             'context_length' : int(context_length),
             'depth_percent' : float(depth_percent),
