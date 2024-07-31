@@ -127,7 +127,7 @@ class OpenAIEvaluator(Evaluator):
 
         ## LLM
         # Use most performant(and cheap) model as grader
-        model = ChatOpenAI(temperature=0, model="gpt-4o-mini", openai_api_key=self.api_key)
+        model = ChatOpenAI(temperature=0, model=self.model_name, openai_api_key=self.api_key)
 
         # Tool
         grade_tool_oai = convert_to_openai_tool(grade)
