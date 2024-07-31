@@ -115,10 +115,14 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
 
                 # We want to make sure that we place our needle at a sentence break so we first see what token a '.' is
                 # period_tokens = self.model_to_test.encode_text_to_tokens('.')
-                period_tokens_japanese = self.model_to_test.encode_text_to_tokens('。\n')
-                
+                period_tokens_japanese = self.model_to_test.encode_text_to_tokens(
+                    "。\n"
+                )
+
                 # Then we iteration backwards until we find the first period
-                while tokens_new_context and (tokens_new_context[-1] not in period_tokens_japanese):
+                while tokens_new_context and (
+                    tokens_new_context[-1] not in period_tokens_japanese
+                ):
                     insertion_point -= 1
                     tokens_new_context = tokens_context[:insertion_point]
 
@@ -227,7 +231,7 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
             test_elapsed_time = test_end_time - test_start_time
 
             results = {
-                'context' : context, # Uncomment this line if you'd like to save the context the model was asked to retrieve from. Warning: This will become very large.
+                "context": context,  # Uncomment this line if you'd like to save the context the model was asked to retrieve from. Warning: This will become very large.
                 "model": self.model_to_test.model_name,
                 "context_length": int(context_length),
                 "depth_percent": float(depth_percent),
@@ -250,7 +254,7 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
                 print(f"Context: {context_length} tokens")
                 print(f"Depth: {depth_percent}%")
                 print(f"Score: {score}")
-                print(f"Fake Needle Score:" {fake_needle_score})
+                print(f"Fake Needle Score: {fake_needle_score}")
                 print(f"Response: {response}\n")
 
             context_file_location = f'{self.model_name.replace(".", "_")}_len_{context_length}_depth_{int(depth_percent*100)}'
