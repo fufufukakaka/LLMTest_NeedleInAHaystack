@@ -4,19 +4,22 @@ from typing import Optional
 from dotenv import load_dotenv
 from jsonargparse import CLI
 
-from . import LLMNeedleHaystackTester, LLMMultiNeedleHaystackTester
+from . import LLMMultiNeedleHaystackTester, LLMNeedleHaystackTester
 from .evaluators import Evaluator, LangSmithEvaluator, OpenAIEvaluator
 from .providers import Anthropic, ModelProvider, OpenAI
 
 load_dotenv()
 
+
 @dataclass
-class CommandArgs():
+class CommandArgs:
     provider: str = "openai"
     evaluator: str = "openai"
     model_name: str = "gpt-3.5-turbo-0125"
     evaluator_model_name: Optional[str] = "gpt-3.5-turbo-0125"
-    needle: Optional[str] = "\nThe best thing to do in San Francisco is eat a sandwich and sit in Dolores Park on a sunny day.\n"
+    needle: Optional[str] = (
+        "\nThe best thing to do in San Francisco is eat a sandwich and sit in Dolores Park on a sunny day.\n"
+    )
     haystack_dir: Optional[str] = "PaulGrahamEssays"
     retrieval_question: Optional[str] = "What is the best thing to do in San Francisco?"
     results_version: Optional[int] = 1
@@ -39,22 +42,33 @@ class CommandArgs():
     eval_set: Optional[str] = "multi-needle-eval-pizza-3"
     # Multi-needle parameters
     multi_needle: Optional[bool] = False
-    needles: list[str] = field(default_factory=lambda: [
-        " Figs are one of the secret ingredients needed to build the perfect pizza. ", 
-        " Prosciutto is one of the secret ingredients needed to build the perfect pizza. ", 
-        " Goat cheese is one of the secret ingredients needed to build the perfect pizza. "
-    ])
+    needles: list[str] = field(
+        default_factory=lambda: [
+            " Figs are one of the secret ingredients needed to build the perfect pizza. ",
+            " Prosciutto is one of the secret ingredients needed to build the perfect pizza. ",
+            " Goat cheese is one of the secret ingredients needed to build the perfect pizza. ",
+        ]
+    )
+    fake_needle: Optional[bool] = False
+    fake_needles: list[str] = field(
+        default_factory=lambda: [
+            " Figs are one of the secret ingredients needed to build the perfect pizza. ",
+            " Prosciutto is one of the secret ingredients needed to build the perfect pizza. ",
+            " Goat cheese is one of the secret ingredients needed to build the perfect pizza. ",
+        ]
+    )
+
 
 def get_model_to_test(args: CommandArgs) -> ModelProvider:
     """
     Determines and returns the appropriate model provider based on the provided command arguments.
-    
+
     Args:
         args (CommandArgs): The command line arguments parsed into a CommandArgs dataclass instance.
-        
+
     Returns:
         ModelProvider: An instance of the specified model provider class.
-    
+
     Raises:
         ValueError: If the specified provider is not supported.
     """
@@ -66,52 +80,69 @@ def get_model_to_test(args: CommandArgs) -> ModelProvider:
         case _:
             raise ValueError(f"Invalid provider: {args.provider}")
 
+
 def get_evaluator(args: CommandArgs) -> Evaluator:
     """
     Selects and returns the appropriate evaluator based on the provided command arguments.
-    
+
     Args:
         args (CommandArgs): The command line arguments parsed into a CommandArgs dataclass instance.
-        
+
     Returns:
         Evaluator: An instance of the specified evaluator class.
-        
+
     Raises:
         ValueError: If the specified evaluator is not supported.
     """
     match args.evaluator.lower():
         case "openai":
-            if args.multi_needle == True:
-                return OpenAIEvaluator(model_name=args.evaluator_model_name,
-                                    question_asked=args.retrieval_question,
-                                    true_answer=",".join(args.needles))
+            if args.multi_needle:
+                return OpenAIEvaluator(
+                    model_name=args.evaluator_model_name,
+                    question_asked=args.retrieval_question,
+                    true_answer=",".join(args.needles),
+                )
+            elif args.fake_needle and args.multi_needle:
+                return OpenAIEvaluator(
+                    model_name=args.evaluator_model_name,
+                    question_asked=args.retrieval_question,
+                    true_answer=",".join(args.needles),
+                    fake_answer=",".join(args.fake_needles),
+                )
             else:
-                return OpenAIEvaluator(model_name=args.evaluator_model_name,
-                                    question_asked=args.retrieval_question,
-                                    true_answer=args.needle)
+                return OpenAIEvaluator(
+                    model_name=args.evaluator_model_name,
+                    question_asked=args.retrieval_question,
+                    true_answer=args.needle,
+                )
         case "langsmith":
             return LangSmithEvaluator()
         case _:
             raise ValueError(f"Invalid evaluator: {args.evaluator}")
 
+
 def main():
     """
     The main function to execute the testing process based on command line arguments.
-    
+
     It parses the command line arguments, selects the appropriate model provider and evaluator,
     and initiates the testing process either for single-needle or multi-needle scenarios.
     """
     args = CLI(CommandArgs, as_positional=False)
     args.model_to_test = get_model_to_test(args)
     args.evaluator = get_evaluator(args)
-    
-    if args.multi_needle == True:
+
+    if args.multi_needle:
         print("Testing multi-needle")
+        tester = LLMMultiNeedleHaystackTester(**args.__dict__)
+    elif args.multi_needle and args.fake_needle:
+        print("Testing multi-needle with fake-needle")
         tester = LLMMultiNeedleHaystackTester(**args.__dict__)
     else:
         print("Testing single-needle")
         tester = LLMNeedleHaystackTester(**args.__dict__)
     tester.start_test()
+
 
 if __name__ == "__main__":
     main()
