@@ -160,7 +160,7 @@ class LLMNeedleHaystackTester:
         score = self.evaluator.evaluate_response(response)
 
         results = {
-            # 'context' : context, # Uncomment this line if you'd like to save the context the model was asked to retrieve from. Warning: This will become very large.
+            'context' : context, # Uncomment this line if you'd like to save the context the model was asked to retrieve from. Warning: This will become very large.
             'model' : self.model_name,
             'context_length' : int(context_length),
             'depth_percent' : float(depth_percent),
@@ -243,8 +243,6 @@ class LLMNeedleHaystackTester:
     
     def insert_needle(self, context, depth_percent, context_length):
         # 改行記号は句読点に置き換える
-        context = context.replace('\n', '。')
-        context = context.replace('\r', '。')
 
         tokens_needle = self.model_to_test.encode_text_to_tokens(self.needle)
         tokens_context = self.model_to_test.encode_text_to_tokens(context)
@@ -267,13 +265,11 @@ class LLMNeedleHaystackTester:
             tokens_new_context = tokens_context[:insertion_point]
 
             # We want to make sure that we place our needle at a sentence break so we first see what token a '.' is
-            period_tokens = self.model_to_test.encode_text_to_tokens('.')
-            period_tokens_japanese = self.model_to_test.encode_text_to_tokens('。')
-            
+            # period_tokens = self.model_to_test.encode_text_to_tokens('.')
+            period_tokens_japanese = self.model_to_test.encode_text_to_tokens('。\n')
+
             # Then we iteration backwards until we find the first period
-            while tokens_new_context and (tokens_new_context[-1] not in period_tokens and
-                                          tokens_new_context[-1] not in period_tokens_japanese
-                                        ):
+            while tokens_new_context and (tokens_new_context[-1] not in period_tokens_japanese):
                 insertion_point -= 1
                 tokens_new_context = tokens_context[:insertion_point]
 

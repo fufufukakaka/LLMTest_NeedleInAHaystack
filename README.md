@@ -1,7 +1,6 @@
 日本語を意識した Needle In A Haystack test のリポジトリです。
 
-- 句読点のあとに needle を挿入するように変更
-- 改行記号を句読点に変更
+- 句読点 + 改行（ `。\n` ）のあとに needle を挿入するように変更
 - 評価基準を日本語に変更
 
 # Needle In A Haystack - Pressure Testing LLMs
