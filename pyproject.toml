@@ -34,6 +34,9 @@ tqdm = "^4.66.4"
 pytest = "^8.3.1"
 langchain-community = "^0.2.9"
 jsonargparse = "^4.32.0"
+langchain-google-vertexai = "^1.0.8"
+google-generativeai = "^0.7.2"
+sentencepiece = "^0.2.0"
 
 
 [tool.poetry.scripts]
