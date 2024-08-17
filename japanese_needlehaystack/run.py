@@ -5,8 +5,14 @@ from dotenv import load_dotenv
 from jsonargparse import CLI
 
 from . import LLMMultiNeedleHaystackTester, LLMNeedleHaystackTester
-from .evaluators import Evaluator, LangSmithEvaluator, OpenAIEvaluator
-from .providers import Anthropic, ModelProvider, OpenAI
+from .evaluators import (
+    AnthropicEvaluator,
+    Evaluator,
+    GoogleEvaluator,
+    LangSmithEvaluator,
+    OpenAIEvaluator,
+)
+from .providers import Anthropic, Google, ModelProvider, OpenAI
 
 load_dotenv()
 
@@ -77,6 +83,8 @@ def get_model_to_test(args: CommandArgs) -> ModelProvider:
             return OpenAI(model_name=args.model_name)
         case "anthropic":
             return Anthropic(model_name=args.model_name)
+        case "google":
+            return Google(model_name=args.model_name)
         case _:
             raise ValueError(f"Invalid provider: {args.provider}")
 
@@ -111,6 +119,46 @@ def get_evaluator(args: CommandArgs) -> Evaluator:
                 )
             else:
                 return OpenAIEvaluator(
+                    model_name=args.evaluator_model_name,
+                    question_asked=args.retrieval_question,
+                    true_answer=args.needle,
+                )
+        case "anthropic":
+            if args.multi_needle:
+                return AnthropicEvaluator(
+                    model_name=args.evaluator_model_name,
+                    question_asked=args.retrieval_question,
+                    true_answer=",".join(args.needles),
+                )
+            elif args.fake_needle and args.multi_needle:
+                return AnthropicEvaluator(
+                    model_name=args.evaluator_model_name,
+                    question_asked=args.retrieval_question,
+                    true_answer=",".join(args.needles),
+                    fake_answer=",".join(args.fake_needles),
+                )
+            else:
+                return AnthropicEvaluator(
+                    model_name=args.evaluator_model_name,
+                    question_asked=args.retrieval_question,
+                    true_answer=args.needle,
+                )
+        case "google":
+            if args.multi_needle:
+                return GoogleEvaluator(
+                    model_name=args.evaluator_model_name,
+                    question_asked=args.retrieval_question,
+                    true_answer=",".join(args.needles),
+                )
+            elif args.fake_needle and args.multi_needle:
+                return GoogleEvaluator(
+                    model_name=args.evaluator_model_name,
+                    question_asked=args.retrieval_question,
+                    true_answer=",".join(args.needles),
+                    fake_answer=",".join(args.fake_needles),
+                )
+            else:
+                return GoogleEvaluator(
                     model_name=args.evaluator_model_name,
                     question_asked=args.retrieval_question,
                     true_answer=args.needle,
