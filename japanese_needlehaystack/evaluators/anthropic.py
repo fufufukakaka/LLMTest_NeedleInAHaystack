@@ -57,27 +57,43 @@ class AnthropicEvaluator(Evaluator):
             model=self.model_name, anthropic_api_key=api_key, **self.model_kwargs
         )
 
-    def evaluate_response(self, response: str) -> int:
-        evaluator = load_evaluator(
-            "labeled_score_string",
-            criteria=self.CRITERIA,
-            llm=self.evaluator,
-        )
+    def evaluate_response(
+        self,
+        response: str,
+        multi_needles: bool = False,
+        evaluate_fake_answer: bool = False,
+    ) -> int:
+        if multi_needles:
+            eval_result = self.evaluate_responses_in_multi_needles(
+                student_answer=response, reference=self.true_answer
+            )
+            return int(eval_result)
+        if evaluate_fake_answer:
+            eval_result = self.evaluate_responses_in_multi_needles(
+                student_answer=response, reference=self.fake_answer
+            )
+            return int(eval_result)
+        else:
+            evaluator = load_evaluator(
+                "labeled_score_string",
+                criteria=self.CRITERIA,
+                llm=self.evaluator,
+            )
 
-        eval_result = evaluator.evaluate_strings(
-            # The models response
-            prediction=response,
-            # The actual answer
-            reference=self.true_answer,
-            # The question asked
-            input=self.question_asked,
-        )
+            eval_result = evaluator.evaluate_strings(
+                # The models response
+                prediction=response,
+                # The actual answer
+                reference=self.true_answer,
+                # The question asked
+                input=self.question_asked,
+            )
 
-        return int(eval_result["score"])
+            return int(eval_result["score"])
 
     def evaluate_responses_in_multi_needles(
         self, student_answer, reference
-    ) -> list[int]:
+    ) -> int:
         """
         multi needle evaluation ではいくつの針を抽出できたかを評価する。
         """

@@ -196,7 +196,6 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
         test_start_time = time.time()
 
         # LangSmith
-        ## TODO: Support for other evaluators
         if self.evaluator.__class__.__name__ == "LangSmithEvaluator":
             print("EVALUATOR: LANGSMITH")
             chain = self.model_to_test.get_langchain_runnable(context)
@@ -214,7 +213,7 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
             test_elapsed_time = test_end_time - test_start_time
 
         else:
-            print("EVALUATOR: OpenAI Model")
+            print(f"EVALUATOR: {self.evaluator} Model")
             # Prepare your message to send to the model you're going to evaluate
             prompt = self.model_to_test.generate_prompt(
                 context, self.retrieval_question
