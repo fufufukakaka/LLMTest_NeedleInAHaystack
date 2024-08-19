@@ -67,7 +67,7 @@ class Google(ModelProvider):
         self.tokenizer = sentencepiece.SentencePieceProcessor(local_vocab_file)
 
         resource_path = pkg_resources.resource_filename(
-            "needlehaystack", "providers/Anthropic_prompt.txt"
+            "japanese_needlehaystack", "providers/Anthropic_prompt.txt"
         )
 
         # Generate the prompt structure for the model
